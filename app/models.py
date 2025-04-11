@@ -6,7 +6,7 @@ import datetime
 class User(Base):
     __tablename__ = 'users'
 
-    id= Column(Integer, primary_key=True, autoincreament=True)
+    id= Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True )
     hashed_password = Column(String, nullable=False )
@@ -24,5 +24,5 @@ class Notes(Base):
     summary = Column(Text)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     owner_id= Column(Integer, ForeignKey('users.id'))
-    owner= relationship('User', back_populates='notes', lazy='selct')
+    owner= relationship('User', back_populates='notes', lazy='select')
 

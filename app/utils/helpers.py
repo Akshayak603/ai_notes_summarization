@@ -10,7 +10,7 @@ async def call_gemini(prompt:str):
     # Call Gemini with the prompt
     try:
         loop = asyncio.get_event_loop()
-        model= genai.GenerativeModel("gemini-pro")
+        model= genai.GenerativeModel("gemini-2.0-flash")
         '''same as model.generate_content(prompt)'''
         func= partial(model.generate_content, prompt)
         '''to run synchronous as asynchronous for non blocking thread''' 

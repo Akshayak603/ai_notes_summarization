@@ -22,6 +22,12 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
+class UserResponse(UserBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
 '''Notes'''
 class NotesCreate(BaseModel):
     title: str
@@ -30,7 +36,6 @@ class NotesCreate(BaseModel):
 
 class NotesResponse(NotesCreate):
     id: int
-    user_id: int
 
     class Config:
         orm_mode = True
@@ -41,5 +46,6 @@ class NoteSummaryRequest(BaseModel):
 
 class NoteSummaryResponse(BaseModel):
     summary: str
+
 
     

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import auth, notes
-from database import init_db, Base, engine
+from database import Base, engine
 
 """Initialization"""
 app = FastAPI(title="AI Notes Generation",
@@ -18,12 +18,13 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/auth", tags=['Notes Authentication'])
-app.include_router()
+app.include_router(notes.router, prefix="/notes", tags=["Notes API"])
 
-@app.on_event('starup')
+# Correct async startup event
+@app.on_event("startup")
 async def startup_event():
-    init_db()
-    Base.metadata.create_all(engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 # Root endpoint
 @app.get("/")

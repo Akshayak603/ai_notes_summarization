@@ -13,7 +13,7 @@ from models import User
 '''loading environment variables'''
 load_dotenv()
 
-pass_context= CryptContext(schemes=['brypt'], deprecated='auto')
+pass_context= CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 async def hash_password(password:str):
     """Hash a password for storing."""

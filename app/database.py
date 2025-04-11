@@ -1,40 +1,41 @@
 import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import create_database, database_exists
+from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
+from contextlib import asynccontextmanager
+# from sqlalchemy_utils import database_exists, create_database
 
 load_dotenv()
 
-# load DB
-DB_URL= os.getenv("DATABASE_URL")
+DB_URL = os.getenv("DATABASE_URL")
 
-# crating engine
-engine= create_async_engine(DB_URL)
+# Create async engine
+engine = create_async_engine(DB_URL, echo=True)
 
-# checking connection
-try:
-    with engine.connect():
-        print("Connected to the database")
-except:
-    print("Failed to connect to the database")
-
-# create global session
+# Sessionmaker
 AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-# create BASE
+# Base model
 Base = declarative_base()
 
-# function for creating local session and closinng it
-def get_db():
-    with AsyncSessionLocal() as Session:
-        yield Session
+# Async DB Dependency
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
 
-# checking db exist or not
-def init_db():
-    if not database_exists(DB_URL):
-        create_database(DB_URL)
-        print("DB created successfully")
+# Async DB connection check
+async def check_connection():
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(lambda _: None)
+        print("Connected to the database")
+    except Exception as e:
+        print("Failed to connect to the database:", e)
 
+# def create_db_if_not_exists():
+#     if not database_exists(DB_URL):
+#         create_database(DB_URL)
+#         print("✅ Database created.")
+#     else:
+#         print("🟢 Database already exists.")
 

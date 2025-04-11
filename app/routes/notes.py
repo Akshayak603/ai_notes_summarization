@@ -17,19 +17,19 @@ async def get_all_notes(user_info: User= Depends(get_user_info),db: AsyncSession
     return await crud.get_notes(user_info, db)
 
 '''Save/Create Notes'''
-@router.post("", response_model=Notes)
+@router.post("", response_model=schemas.NotesResponse)
 async def save_note(note: schemas.NotesCreate, user_info: User= Depends(get_user_info), db: AsyncSession= Depends(get_db)):
     return await crud.post_notes(user_info, db, note)
 
 '''Delete Notes'''
-@router.get('/{note_id}')
+@router.get('/{note_id}',response_model=schemas.NotesResponse)
 async def delete_note(note_id: int, user_info: User= Depends(get_user_info), db: AsyncSession= Depends(get_db)):
     return await crud.delete_note(db,note_id, user_info)
 
 '''Summarize Notes'''
-@router.get("/summarize",response_model=schemas.NoteSummaryResponse, dependencies=[Depends(get_user_info)])
-async def summarize_notes(data: schemas.NoteSummaryRequest,db: AsyncSession = Depends(get_db)):
-    return await crud.summarize_note(db, data)
+@router.post("/summarize",response_model=schemas.NoteSummaryResponse, dependencies=[Depends(get_user_info)])
+async def summarize_notes(data: schemas.NoteSummaryRequest):
+    return await crud.summarize_note(data)
 
 
 

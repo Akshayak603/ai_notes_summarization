@@ -30,13 +30,16 @@ async def delete_note(db:AsyncSession, note_id:int, user_info: User):
 
 
 '''Summarize note via Gemini'''
-async def summarize_note(data:dict, db:AsyncSession):
+async def summarize_note(data:dict):
+    print(f"Data: {data}")
     content = data.content
+    print(f"Content: {content}")
 
     # If previous_summary exists, modify prompt accordingly
     if data.previous_summary:
         prompt = (
-            "The user was not satisfied with the previous summary. "
+            "The user was not satisfied with the previous summary."
+            "Do not mention anything about content or previous summary, just summarize content more accurately.\n"
             "Please generate a better summary of the following note content.\n\n"
             f"Content:\n{content}\n\n"
             f"Previous Summary:\n{data.previous_summary}"
@@ -45,18 +48,8 @@ async def summarize_note(data:dict, db:AsyncSession):
         prompt = f"Summarize the following note content:\n\n{content}"
 
     summary = await call_gemini(prompt=prompt)
+    print(f"Summary: {summary}")
     return {"summary": summary}
-
-
-'''If user likes it we are saving this summary'''
-# async def save_summary(db:AsyncSession, note_id:int, summary:str):
-#     note = db.query(Notes).get(note_id)
-#     if not note:
-#         raise HTTPException(status_code=404, detail="Note not found")
-#     note.summary = summary
-#     db.commit()
-#     db.refresh(note)
-#     return note
 
 
     
