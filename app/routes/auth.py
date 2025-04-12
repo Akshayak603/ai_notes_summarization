@@ -36,7 +36,10 @@ async def register_user(user: schemas.UserRegister, db: AsyncSession= Depends(ge
 '''login'''
 @router.post('/login')
 async def login_user(user: OAuth2PasswordRequestForm= Depends(), db: AsyncSession= Depends(get_db)):
-    stmt= select(User).where(func.lower(User.username)==user.username.lower())
+    stmt= select(User).where(or_(
+            func.lower(User.username) == user.username.lower(),
+            func.lower(User.email) == user.username.lower()
+        ))
     result= await db.execute(stmt)
     existing_user = result.scalar_one_or_none()
     if not existing_user or not await verify_password(existing_user.hashed_password, user.password):
