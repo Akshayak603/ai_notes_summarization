@@ -22,7 +22,7 @@ async def save_note(note: schemas.NotesCreate, user_info: User= Depends(get_user
     return await crud.post_notes(user_info, db, note)
 
 '''Delete Notes'''
-@router.get('/{note_id}',response_model=schemas.NotesResponse)
+@router.delete('/{note_id}',response_model=schemas.NotesResponse)
 async def delete_note(note_id: int, user_info: User= Depends(get_user_info), db: AsyncSession= Depends(get_db)):
     return await crud.delete_note(db,note_id, user_info)
 
