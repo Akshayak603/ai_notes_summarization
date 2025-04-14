@@ -74,9 +74,10 @@ async def get_user_info(token: str= Depends(oauth), db: AsyncSession= Depends(ge
         if not user_obj:
             raise HTTPException(status_code=401, detail="User not found")
         
-        await set_user_in_cache(token=token, user_data=user_obj_to_dict(user_obj))
+        user_dict= user_obj_to_dict(user_obj)
+        await set_user_in_cache(token=token, user_data=user_dict)
         
-        return user_obj
+        return user_dict
     except:
         raise HTTPException(status_code=401, detail="Invalid Token or Token has expired")
         

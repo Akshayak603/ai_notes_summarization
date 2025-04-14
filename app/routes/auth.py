@@ -50,7 +50,7 @@ async def login_user(user: OAuth2PasswordRequestForm= Depends(), db: AsyncSessio
 
 '''Getting user info'''
 @router.get('/me', response_model=schemas.UserResponse)
-async def get_user(user: User=Depends(get_user_info)):
+async def get_user(user: dict=Depends(get_user_info)):
     return user
 
 

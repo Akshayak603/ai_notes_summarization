@@ -4,6 +4,7 @@ import asyncio
 import time
 from functools import partial
 from fastapi import HTTPException
+from models import User
 
 # Initialize Gemini with an api key
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -25,7 +26,7 @@ async def call_gemini(prompt:str):
         return  "Failed to generate summary"
     
 '''Model Object to dictionary'''
-def user_obj_to_dict(user):
+def user_obj_to_dict(user:User):
     return {
         "username": user.username,
         "email": user.email,
