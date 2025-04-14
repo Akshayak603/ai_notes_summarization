@@ -9,3 +9,6 @@ PyJWT
 pydantic[email]
 python-multipart
 alembic
+redis[async] 
+aioredis
+
