@@ -52,10 +52,9 @@ oauth= OAuth2PasswordBearer(tokenUrl=('auth/login'))
 async def get_user_info(token: str= Depends(oauth), db: AsyncSession= Depends(get_db)):
     '''get user info from token'''
     try:
-        # chack for cache user
+        # check for cache user
         cache_user= await get_user_from_cache(token=token)
         if cache_user:
-            print("Cached user: ", cache_user)
             return cache_user
         
         payload= await decode_access_token(token)
