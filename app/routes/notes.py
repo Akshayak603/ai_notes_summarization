@@ -13,23 +13,23 @@ router= APIRouter()
 
 '''Get all notes'''
 @router.get("")
-async def get_all_notes(user_info: User= Depends(get_user_info),db: AsyncSession = Depends(get_db)):
+async def get_all_notes(user_info: dict= Depends(get_user_info),db: AsyncSession = Depends(get_db)):
     return await crud.get_notes(user_info, db)
 
 '''Save/Create Notes'''
 @router.post("", response_model=schemas.NotesResponse)
-async def save_note(note: schemas.NotesCreate, user_info: User= Depends(get_user_info), db: AsyncSession= Depends(get_db)):
+async def save_note(note: schemas.NotesCreate, user_info: dict= Depends(get_user_info), db: AsyncSession= Depends(get_db)):
     return await crud.post_notes(user_info, db, note)
 
 '''Delete Notes'''
 @router.delete('/{note_id}',response_model=schemas.NotesResponse)
-async def delete_note(note_id: int, user_info: User= Depends(get_user_info), db: AsyncSession= Depends(get_db)):
+async def delete_note(note_id: int, user_info: dict= Depends(get_user_info), db: AsyncSession= Depends(get_db)):
     return await crud.delete_note(db,note_id, user_info)
 
 '''Summarize Notes'''
-@router.post("/summarize",response_model=schemas.NoteSummaryResponse, dependencies=[Depends(get_user_info)])
-async def summarize_notes(data: schemas.NoteSummaryRequest):
-    return await crud.summarize_note(data)
+@router.post("/summarize",response_model=schemas.NoteSummaryResponse)
+async def summarize_notes(data: schemas.NoteSummaryRequest, user_info: dict= Depends(get_user_info)):
+    return await crud.summarize_note(data, user_info)
 
 
 

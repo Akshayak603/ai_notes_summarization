@@ -1,28 +1,29 @@
 from models import Notes, User
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
-from utils.helpers import call_gemini
+from utils.helpers import call_gemini, rate_limited_gemini_call
+from services.redis_cache import redis_client
 from sqlalchemy import select
 import schemas
 
 '''Get all notes'''
-async def get_notes(user_info:User, db:AsyncSession):
-    stmt= select(Notes).where(Notes.owner_id==user_info.id)
+async def get_notes(user_info:dict, db:AsyncSession):
+    stmt= select(Notes).where(Notes.owner_id==user_info['id'])
     result= await db.execute(stmt)
     return result.scalars().all()
 
 '''Post all notes'''
-async def post_notes(user_info:User, db:AsyncSession, notes_data: schemas.NotesCreate):
-    new_note= Notes(**notes_data.dict(), owner_id= user_info.id)
+async def post_notes(user_info:dict, db:AsyncSession, notes_data: schemas.NotesCreate):
+    new_note= Notes(**notes_data.dict(), owner_id= user_info['id'])
     db.add(new_note)
     await db.commit()
     await db.refresh(new_note)
     return new_note
 
 '''Delete note'''
-async def delete_note(db:AsyncSession, note_id:int, user_info: User):
+async def delete_note(db:AsyncSession, note_id:int, user_info: dict):
     note= await db.get(Notes, note_id)
-    if not note or note.owner_id != user_info.id:
+    if not note or note.owner_id != user_info['id']:
         raise HTTPException(status_code=404, detail="Note not found or Anauthorized")
     await db.delete(note)
     await db.commit()
@@ -30,10 +31,13 @@ async def delete_note(db:AsyncSession, note_id:int, user_info: User):
 
 
 '''Summarize note via Gemini'''
-async def summarize_note(data:dict):
-    print(f"Data: {data}")
+async def summarize_note(data:dict, user_info: dict):
+
+    '''Checking requests per minute via redis'''
+    await rate_limited_gemini_call(redis_client=redis_client, user_id=user_info['id'])
+  
     content = data.content
-    print(f"Content: {content}")
+
 
     # If previous_summary exists, modify prompt accordingly
     if data.previous_summary:

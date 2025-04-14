@@ -3,6 +3,7 @@ extra_knowledge.txt
 ai_venv
 app/__pycache__
 app/routes/__pycache__
+app/services/__pycache__
 app/utils/__pycache__
 alembic/__pycache__
 alembic/versions/__pycache__

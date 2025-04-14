@@ -9,6 +9,8 @@ from database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from models import User
+from services.redis_cache import get_user_from_cache, set_user_in_cache
+from utils.helpers import user_obj_to_dict
 
 '''loading environment variables'''
 load_dotenv()
@@ -50,6 +52,12 @@ oauth= OAuth2PasswordBearer(tokenUrl=('auth/login'))
 async def get_user_info(token: str= Depends(oauth), db: AsyncSession= Depends(get_db)):
     '''get user info from token'''
     try:
+        # chack for cache user
+        cache_user= await get_user_from_cache(token=token)
+        if cache_user:
+            print("Cached user: ", cache_user)
+            return cache_user
+        
         payload= await decode_access_token(token)
 
         if not payload:
@@ -65,6 +73,8 @@ async def get_user_info(token: str= Depends(oauth), db: AsyncSession= Depends(ge
 
         if not user_obj:
             raise HTTPException(status_code=401, detail="User not found")
+        
+        await set_user_in_cache(token=token, user_data=user_obj_to_dict(user_obj))
         
         return user_obj
     except:
